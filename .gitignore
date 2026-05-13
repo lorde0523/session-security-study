@@ -1,0 +1,15 @@
+.gradle/
+build/
+out/
+
+*.class
+*.log
+
+.idea/
+*.iml
+.vscode/
+
+src/main/resources/application-local.yml
+src/test/resources/application-local.yml
+
+HELP.md
