@@ -18,8 +18,6 @@ public class AuthController {
         SessionVo sessionVo = new SessionVo(
                 request.userId(),
                 request.userName(),
-                request.uuid(),
-                request.client(),
                 rolesFor(request.userId())
         );
         httpSession.setAttribute(SessionVo.SESSION_ATTRIBUTE_NAME, sessionVo);

@@ -31,9 +31,7 @@ class SecurityIntegrationTest {
                         .content("""
                                 {
                                   "userId": "admin",
-                                  "userName": "Admin User",
-                                  "uuid": "swagger-test-uuid",
-                                  "client": "swagger"
+                                  "userName": "Admin User"
                                 }
                                 """))
                 .andExpect(status().isOk())
@@ -51,7 +49,7 @@ class SecurityIntegrationTest {
     }
 
     @Test
-    void securedApiWithoutUuidReturnsUnauthorized() throws Exception {
+    void securedApiWithoutMetaUuidReturnsUnauthorized() throws Exception {
         mockMvc.perform(get("/api/common/me")
                         .header("X-USER-ID", "user")
                         .header("X-CLIENT", "swagger")
@@ -62,7 +60,7 @@ class SecurityIntegrationTest {
     }
 
     @Test
-    void securedApiWithoutClientReturnsUnauthorized() throws Exception {
+    void securedApiWithoutMetaClientReturnsUnauthorized() throws Exception {
         mockMvc.perform(get("/api/common/me")
                         .header("X-USER-ID", "user")
                         .header("X-UUID", "swagger-test-uuid")
@@ -105,9 +103,7 @@ class SecurityIntegrationTest {
                         .content("""
                                 {
                                   "userId": "manager",
-                                  "userName": "Manager User",
-                                  "uuid": "swagger-test-uuid",
-                                  "client": "swagger"
+                                  "userName": "Manager User"
                                 }
                                 """))
                 .andExpect(status().isOk())
@@ -115,7 +111,10 @@ class SecurityIntegrationTest {
 
         MockHttpSession session = (MockHttpSession) loginResult.getRequest().getSession(false);
 
-        mockMvc.perform(get("/api/common/me").session(session))
+        mockMvc.perform(get("/api/common/me")
+                        .session(session)
+                        .header("X-UUID", "swagger-test-uuid")
+                        .header("X-CLIENT", "swagger"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message", is("current session")))
                 .andExpect(jsonPath("$.session.userId", is("manager")))

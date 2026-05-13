@@ -4,7 +4,7 @@
 
 **Goal:** Build a Java 21 Spring Boot Gradle project that demonstrates session-based API authorization with a Swagger/header fallback.
 
-**Architecture:** A custom `OncePerRequestFilter` resolves `SessionVo` from `HttpSession` first and from development headers second. It validates uuid/client/roles, writes an `Authentication` to the Spring Security context, and lets `SecurityFilterChain` enforce URL role rules.
+**Architecture:** A custom `OncePerRequestFilter` resolves `SessionVo` from `HttpSession` first and from development headers second. It validates request meta headers (`X-UUID`, `X-CLIENT`) separately from `SessionVo`, writes an `Authentication` to the Spring Security context, and lets `SecurityFilterChain` enforce URL role rules.
 
 **Tech Stack:** Java 21, Spring Boot 3.3.x, Gradle, Spring Security, Spring Web, Spring Validation, Spring Data JPA, Oracle JDBC, Springdoc OpenAPI, JUnit 5, MockMvc.
 
@@ -121,7 +121,7 @@ public class SessionSecurityApplication {
 
 ```java
 // See the implemented test file for exact assertions. Tests cover:
-// public auth access, 401 without session, 401 missing uuid/client,
+// public auth access, 401 without session, 401 missing request meta uuid/client,
 // USER access to user API, USER forbidden from admin API,
 // and session login enabling common API access.
 ```
@@ -144,7 +144,7 @@ Expected: FAIL before production security classes exist.
 
 ```java
 // SessionResolver checks HttpSession first, then enabled development headers:
-// X-USER-ID, X-USER-NAME, X-UUID, X-CLIENT, X-ROLES.
+// X-USER-ID, X-USER-NAME, X-ROLES.
 ```
 
 - [ ] **Step 2: Run tests**
@@ -164,7 +164,7 @@ Expected: still FAIL until filter, config, and controllers are implemented.
 - [ ] **Step 1: Implement filter that creates Spring Security authentication from `SessionVo`**
 
 ```java
-// The filter validates session, uuid, client, and roles before setting SecurityContextHolder.
+// The filter validates SessionVo, request meta headers, and roles before setting SecurityContextHolder.
 ```
 
 - [ ] **Step 2: Configure URL access rules**

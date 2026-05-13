@@ -6,8 +6,6 @@ import java.util.List;
 public record SessionVo(
         String userId,
         String userName,
-        String uuid,
-        String client,
         List<String> roles
 ) implements Serializable {
 

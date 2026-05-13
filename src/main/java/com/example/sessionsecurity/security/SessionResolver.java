@@ -42,18 +42,14 @@ public class SessionResolver {
 
         String userId = request.getHeader("X-USER-ID");
         String userName = request.getHeader("X-USER-NAME");
-        String uuid = request.getHeader("X-UUID");
-        String client = request.getHeader("X-CLIENT");
         List<String> roles = parseRoles(request.getHeader("X-ROLES"));
 
         if (!StringUtils.hasText(userId)
-                && !StringUtils.hasText(uuid)
-                && !StringUtils.hasText(client)
                 && roles.isEmpty()) {
             return Optional.empty();
         }
 
-        return Optional.of(new SessionVo(userId, userName, uuid, client, roles));
+        return Optional.of(new SessionVo(userId, userName, roles));
     }
 
     private List<String> parseRoles(String headerValue) {

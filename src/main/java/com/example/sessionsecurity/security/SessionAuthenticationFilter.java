@@ -54,7 +54,7 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
         try {
             SessionVo sessionVo = sessionResolver.resolve(request)
                     .orElseThrow(() -> new SessionValidationException("Session information is missing."));
-            validate(sessionVo);
+            validate(sessionVo, request);
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
@@ -74,12 +74,12 @@ public class SessionAuthenticationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void validate(SessionVo sessionVo) {
-        if (!StringUtils.hasText(sessionVo.uuid())) {
-            throw new SessionValidationException("Session uuid is required.");
+    private void validate(SessionVo sessionVo, HttpServletRequest request) {
+        if (!StringUtils.hasText(request.getHeader("X-UUID"))) {
+            throw new SessionValidationException("Request meta uuid is required.");
         }
-        if (!StringUtils.hasText(sessionVo.client())) {
-            throw new SessionValidationException("Session client is required.");
+        if (!StringUtils.hasText(request.getHeader("X-CLIENT"))) {
+            throw new SessionValidationException("Request meta client is required.");
         }
         if (sessionVo.roles().isEmpty()) {
             throw new SessionValidationException("At least one role is required.");
