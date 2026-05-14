@@ -12,7 +12,47 @@ spring:
     hibernate:
       ddl-auto: none
     open-in-view: false
+  mail:
+    host: localhost
+    port: 1025
+    username:
+    password:
+    properties:
+      mail:
+        smtp:
+          auth: false
+          starttls:
+            enable: false
 
 app:
   security:
     header-session-enabled: true
+  async:
+    core-pool-size: 4
+    max-pool-size: 8
+    queue-capacity: 100
+    thread-name-prefix: app-async-
+  cache:
+    type: simple
+    cache-names:
+      - sampleSimple
+      - sampleCaffeine
+  datasource:
+    routing-enabled: true
+    users:
+      main:
+        username: sample
+        password: sample
+      batch:
+        username: sample_batch
+        password: sample_batch
+      read:
+        username: sample_read
+        password: sample_read
+      report:
+        username: sample_report
+        password: sample_report
+  mail:
+    from: no-reply@example.com
+  scheduler:
+    sample-job-enabled: true

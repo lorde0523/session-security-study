@@ -112,6 +112,137 @@ X-CLIENT: swagger
 - `src/main/java/com/example/sessionsecurity/api/SampleApiController.java`: 권한 테스트용 API
 - `src/main/java/com/example/sessionsecurity/swagger/SwaggerConfig.java`: Swagger header 설정
 
+## 공통 샘플 모듈
+
+다른 개발자가 가져다 쓰기 쉽게 공통 기능은 `common`, 사용 예시는 `sample` 패키지에 나눠두었습니다.
+
+```text
+com.example.sessionsecurity.common
+com.example.sessionsecurity.sample
+```
+
+추가된 공통 샘플은 다음과 같습니다.
+
+- Async: `common.async`, `sample.async`
+- Cache simple/Caffeine: `common.cache`, `sample.cache`
+- Exception/API response: `common.exception`, `common.response`, `sample.exception`
+- SessionVo 권한 체크: `common.security`, `sample.security`
+- DDL to JPA Entity generator: `common.ddl`, `sample.jpa`
+- Multi DB dynamic routing: `common.datasource`, `sample.mybatis`
+- SMTP mail: `common.mail`, `sample.mail`
+- Paging for JPA/MyBatis: `common.paging`, `sample.paging`
+- Quartz scheduler: `common.scheduler`, `sample.scheduler`
+- Swagger 작성 샘플: `sample.swagger`
+
+## Cache 설정
+
+기본 Spring Cache와 Caffeine을 설정값으로 바꿔가며 테스트할 수 있습니다.
+
+```yaml
+app:
+  cache:
+    type: simple # simple | caffeine
+```
+
+샘플 API:
+
+- `GET /api/sample/cache/simple/{id}`
+- `GET /api/sample/cache/caffeine/{id}`
+- `DELETE /api/sample/cache`
+
+## SessionVo 권한 체크 공통 사용법
+
+직접 체크:
+
+```java
+roleChecker.requireAny("ADMIN", "MANAGER");
+```
+
+어노테이션 체크:
+
+```java
+@RequiredRoles("ADMIN")
+public ApiResponse<?> adminOnly() {
+    return ApiResponse.ok();
+}
+```
+
+샘플 API:
+
+- `GET /api/sample/roles/me`
+- `GET /api/sample/roles/admin-direct`
+- `GET /api/sample/roles/admin-annotation`
+- `GET /api/sample/roles/manager-or-admin`
+
+## Multi DB 설정
+
+Oracle JDBC URL은 같고 username/password만 4개로 나뉘는 상황을 기준으로 구성했습니다.
+
+```yaml
+app:
+  datasource:
+    routing-enabled: true
+    users:
+      main:
+        username: sample
+        password: sample
+      batch:
+        username: sample_batch
+        password: sample_batch
+      read:
+        username: sample_read
+        password: sample_read
+      report:
+        username: sample_report
+        password: sample_report
+```
+
+서비스나 매퍼 호출 메서드에 붙여 사용할 수 있습니다.
+
+```java
+@UseDbUser("report")
+public void selectReportData() {
+    // JPA repository or MyBatis mapper call
+}
+```
+
+## Paging
+
+JPA는 `PageRequestDto.toPageable()`을 사용하고, MyBatis는 `offset`, `limit` 파라미터를 사용합니다.
+
+```java
+PageRequestDto request = new PageRequestDto(1, 20);
+Pageable pageable = request.toPageable();
+Map<String, Integer> params = MyBatisPagingSupport.parameters(request);
+```
+
+Oracle MyBatis SQL 예시:
+
+```sql
+SELECT *
+FROM TB_SAMPLE
+ORDER BY SAMPLE_ID DESC
+OFFSET #{offset} ROWS FETCH NEXT #{limit} ROWS ONLY
+```
+
+## DDL to Entity
+
+간단한 Oracle `CREATE TABLE` DDL을 JPA Entity 소스 문자열로 변환하는 학습용 generator를 넣었습니다.
+
+샘플 API:
+
+- `POST /api/sample/jpa/entity-source`
+
+## SMTP / Quartz / Async
+
+샘플 API:
+
+- `GET /api/sample/async/message`
+- `POST /api/sample/mail`
+- `POST /api/sample/quartz/once`
+
+SMTP는 `spring.mail.*`, Quartz는 Spring Boot 기본 in-memory store 기준입니다.
+
 ## 테스트
 
 ```powershell
