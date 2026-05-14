@@ -11,3 +11,7 @@ spring:
 app:
   security:
     header-session-enabled: true
+  datasource:
+    routing-enabled: false
+  cache:
+    type: simple
