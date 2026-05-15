@@ -8,7 +8,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 public class MultiDataSourceProperties {
 
     private boolean routingEnabled;
+    private String defaultUser = "main";
     private Map<String, DbUserProperties> users = new LinkedHashMap<>();
+    private Map<String, String> urlUserMappings = new LinkedHashMap<>();
 
     public boolean isRoutingEnabled() {
         return routingEnabled;
@@ -24,6 +26,22 @@ public class MultiDataSourceProperties {
 
     public void setUsers(Map<String, DbUserProperties> users) {
         this.users = users;
+    }
+
+    public String getDefaultUser() {
+        return defaultUser;
+    }
+
+    public void setDefaultUser(String defaultUser) {
+        this.defaultUser = defaultUser;
+    }
+
+    public Map<String, String> getUrlUserMappings() {
+        return urlUserMappings;
+    }
+
+    public void setUrlUserMappings(Map<String, String> urlUserMappings) {
+        this.urlUserMappings = urlUserMappings;
     }
 
     public static class DbUserProperties {

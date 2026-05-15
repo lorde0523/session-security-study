@@ -19,6 +19,7 @@ public class MultiDataSourceConfig {
     @Bean
     @Primary
     DataSource dataSource(DataSourceProperties baseProperties, MultiDataSourceProperties multiProperties) {
+        validateUsers(multiProperties);
         Map<Object, Object> targets = new LinkedHashMap<>();
         multiProperties.getUsers().forEach((key, user) ->
                 targets.put(key, createDataSource(baseProperties, user))
@@ -26,11 +27,28 @@ public class MultiDataSourceConfig {
 
         RoutingDataSource routingDataSource = new RoutingDataSource();
         routingDataSource.setTargetDataSources(targets);
-        routingDataSource.setDefaultTargetDataSource(targets.getOrDefault("main", targets.values().stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("At least one datasource user is required."))));
+        routingDataSource.setDefaultTargetDataSource(targets.get(multiProperties.getDefaultUser()));
         routingDataSource.afterPropertiesSet();
         return routingDataSource;
+    }
+
+    private void validateUsers(MultiDataSourceProperties multiProperties) {
+        if (multiProperties.getUsers().isEmpty()) {
+            throw new IllegalStateException("At least one datasource user is required.");
+        }
+
+        String defaultUser = multiProperties.getDefaultUser();
+        if (!multiProperties.getUsers().containsKey(defaultUser)) {
+            throw new IllegalStateException("Default datasource user '" + defaultUser + "' is required.");
+        }
+
+        multiProperties.getUrlUserMappings().forEach((pathPattern, userKey) -> {
+            if (!multiProperties.getUsers().containsKey(userKey)) {
+                throw new IllegalStateException(
+                        "Datasource user '" + userKey + "' for path pattern '" + pathPattern + "' is not defined."
+                );
+            }
+        });
     }
 
     private DataSource createDataSource(

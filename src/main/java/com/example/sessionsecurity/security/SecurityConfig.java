@@ -1,6 +1,8 @@
 package com.example.sessionsecurity.security;
 
+import com.example.sessionsecurity.common.datasource.DbUserRoutingFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,11 +19,12 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
+            ObjectProvider<DbUserRoutingFilter> dbUserRoutingFilterProvider,
             SessionAuthenticationFilter sessionAuthenticationFilter,
             JsonAuthenticationEntryPoint authenticationEntryPoint,
             JsonAccessDeniedHandler accessDeniedHandler
     ) throws Exception {
-        return http
+        HttpSecurity configuredHttp = http
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
@@ -40,8 +43,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/manager/**").hasAnyRole("MANAGER", "ADMIN")
                         .requestMatchers("/api/user/**").hasAnyRole("USER", "MANAGER", "ADMIN")
                         .requestMatchers("/api/common/**").authenticated()
-                        .anyRequest().authenticated())
-                .addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+                        .anyRequest().authenticated());
+
+        DbUserRoutingFilter dbUserRoutingFilter = dbUserRoutingFilterProvider.getIfAvailable();
+        configuredHttp.addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        if (dbUserRoutingFilter != null) {
+            configuredHttp.addFilterBefore(dbUserRoutingFilter, SessionAuthenticationFilter.class);
+        }
+        return configuredHttp.build();
     }
 }
