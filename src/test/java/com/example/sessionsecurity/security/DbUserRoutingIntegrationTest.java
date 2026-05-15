@@ -1,5 +1,9 @@
 package com.example.sessionsecurity.security;
 
+import com.example.sessionsecurity.common.datasource.DbUserContext;
+import com.example.sessionsecurity.common.response.ApiResponse;
+import java.util.Map;
+import java.util.Optional;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -7,11 +11,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -67,5 +76,38 @@ class DbUserRoutingIntegrationTest {
                         .header("X-ROLES", "USER"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.selectedDbUser", is("report")));
+    }
+
+    @Test
+    void selectsDbUserFromFirstRequestPathSegment() throws Exception {
+        mockMvc.perform(get("/read/test/routing-user/first-segment")
+                        .header("X-USER-ID", "user")
+                        .header("X-USER-NAME", "Normal User")
+                        .header("X-UUID", "swagger-test-uuid")
+                        .header("X-CLIENT", "swagger")
+                        .header("X-ROLES", "USER"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.selectedDbUser", is("read")));
+    }
+
+    @TestConfiguration
+    static class FirstSegmentRoutingTestConfiguration {
+
+        @Bean
+        FirstSegmentRoutingTestController firstSegmentRoutingTestController() {
+            return new FirstSegmentRoutingTestController();
+        }
+    }
+
+    @RestController
+    @RequestMapping("/read/test")
+    static class FirstSegmentRoutingTestController {
+
+        @GetMapping("/routing-user/first-segment")
+        ApiResponse<Map<String, String>> firstSegmentRouting() {
+            return ApiResponse.ok(Map.of(
+                    "selectedDbUser", Optional.ofNullable(DbUserContext.get()).orElse("none")
+            ));
+        }
     }
 }
