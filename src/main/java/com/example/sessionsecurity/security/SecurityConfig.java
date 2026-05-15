@@ -46,11 +46,10 @@ public class SecurityConfig {
                         .anyRequest().authenticated());
 
         DbUserRoutingFilter dbUserRoutingFilter = dbUserRoutingFilterProvider.getIfAvailable();
+        configuredHttp.addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         if (dbUserRoutingFilter != null) {
             configuredHttp.addFilterBefore(dbUserRoutingFilter, SessionAuthenticationFilter.class);
         }
-
-        configuredHttp.addFilterBefore(sessionAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return configuredHttp.build();
     }
 }
