@@ -94,7 +94,7 @@ class DbUserRoutingIntegrationTest {
     static class FirstSegmentRoutingTestConfiguration {
 
         @Bean
-        FirstSegmentRoutingTestController firstSegmentRoutingTestController() {
+        FirstSegmentRoutingTestController testController() {
             return new FirstSegmentRoutingTestController();
         }
     }
