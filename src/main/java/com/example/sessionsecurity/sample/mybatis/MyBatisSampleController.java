@@ -5,6 +5,7 @@ import com.example.sessionsecurity.common.datasource.UseDbUser;
 import com.example.sessionsecurity.common.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +19,7 @@ public class MyBatisSampleController {
     @GetMapping("/routing-user")
     public ApiResponse<Map<String, String>> routingUser() {
         return ApiResponse.ok(Map.of(
-                "selectedDbUser", DbUserContext.get(),
+                "selectedDbUser", selectedDbUser(),
                 "usage", "Put @UseDbUser on a service method that calls MyBatis mapper."
         ));
     }
@@ -27,7 +28,7 @@ public class MyBatisSampleController {
     @GetMapping("/routing-user/by-url")
     public ApiResponse<Map<String, String>> routingUserByUrl() {
         return ApiResponse.ok(Map.of(
-                "selectedDbUser", DbUserContext.get(),
+                "selectedDbUser", selectedDbUser(),
                 "usage", "Configure app.datasource.url-user-mappings to route by request URI."
         ));
     }
@@ -37,7 +38,7 @@ public class MyBatisSampleController {
     @GetMapping("/routing-user/by-url-with-annotation")
     public ApiResponse<Map<String, String>> routingUserByUrlWithAnnotation() {
         return ApiResponse.ok(Map.of(
-                "selectedDbUser", DbUserContext.get(),
+                "selectedDbUser", selectedDbUser(),
                 "usage", "@UseDbUser has higher priority within the annotated method scope."
         ));
     }
@@ -46,8 +47,12 @@ public class MyBatisSampleController {
     @GetMapping("/routing-user/default")
     public ApiResponse<Map<String, String>> routingUserDefault() {
         return ApiResponse.ok(Map.of(
-                "selectedDbUser", DbUserContext.get(),
+                "selectedDbUser", selectedDbUser(),
                 "usage", "When no URL rule matches, default datasource user is applied."
         ));
+    }
+
+    private String selectedDbUser() {
+        return Optional.ofNullable(DbUserContext.get()).orElse("none");
     }
 }
