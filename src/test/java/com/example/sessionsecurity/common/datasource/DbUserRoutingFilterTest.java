@@ -51,4 +51,33 @@ class DbUserRoutingFilterTest {
 
         assertNull(DbUserContext.get());
     }
+
+    @Test
+    void selectsFirstPathSegmentWhenItMatchesConfiguredUser() throws Exception {
+        MultiDataSourceProperties properties = new MultiDataSourceProperties();
+        properties.setDefaultUser("main");
+
+        MultiDataSourceProperties.DbUserProperties mainUser = new MultiDataSourceProperties.DbUserProperties();
+        mainUser.setUsername("main-user");
+        mainUser.setPassword("main-password");
+
+        MultiDataSourceProperties.DbUserProperties readUser = new MultiDataSourceProperties.DbUserProperties();
+        readUser.setUsername("read-user");
+        readUser.setPassword("read-password");
+
+        LinkedHashMap<String, MultiDataSourceProperties.DbUserProperties> users = new LinkedHashMap<>();
+        users.put("main", mainUser);
+        users.put("read", readUser);
+        properties.setUsers(users);
+
+        DbUserRoutingFilter filter = new DbUserRoutingFilter(new DbUserRoutingRuleMatcher(properties));
+
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/read/items");
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        FilterChain chain = (req, res) -> assertEquals("read", DbUserContext.get());
+
+        filter.doFilter(request, response, chain);
+
+        assertNull(DbUserContext.get());
+    }
 }

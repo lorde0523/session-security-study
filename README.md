@@ -206,6 +206,12 @@ public void selectReportData() {
 }
 ```
 
+요청 경로의 첫 번째 segment가 `users`에 정의된 key와 같으면 그 사용자로 자동 라우팅됩니다.
+
+예를 들어 `@RequestMapping("/read/anything")` 경로로 들어오면 첫 번째 segment인 `read`를 기준으로 `app.datasource.users.read`의 username/password가 사용됩니다.
+
+추가 세부 경로 제어가 필요할 때만 `app.datasource.url-user-mappings`를 함께 사용하면 됩니다.
+
 ## Paging
 
 JPA는 `PageRequestDto.toPageable()`을 사용하고, MyBatis는 `offset`, `limit` 파라미터를 사용합니다.
