@@ -11,11 +11,16 @@ public class UseDbUserAspect {
 
     @Around("@annotation(useDbUser)")
     public Object route(ProceedingJoinPoint joinPoint, UseDbUser useDbUser) throws Throwable {
+        String previous = DbUserContext.get();
         try {
             DbUserContext.set(useDbUser.value());
             return joinPoint.proceed();
         } finally {
-            DbUserContext.clear();
+            if (previous == null) {
+                DbUserContext.clear();
+            } else {
+                DbUserContext.set(previous);
+            }
         }
     }
 }

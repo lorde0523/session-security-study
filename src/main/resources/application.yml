@@ -39,6 +39,7 @@ app:
       - sampleCaffeine
   datasource:
     routing-enabled: true
+    default-user: main
     users:
       main:
         username: sample
@@ -52,6 +53,8 @@ app:
       report:
         username: sample_report
         password: sample_report
+    url-user-mappings:
+      /api/sample/mybatis/**: read
   mail:
     from: no-reply@example.com
   scheduler:
