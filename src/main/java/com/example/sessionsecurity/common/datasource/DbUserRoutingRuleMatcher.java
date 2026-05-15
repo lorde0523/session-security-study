@@ -32,6 +32,9 @@ public class DbUserRoutingRuleMatcher {
     }
 
     private String extractFirstPathSegment(String requestUri) {
+        if (!StringUtils.hasText(requestUri)) {
+            return "";
+        }
         String[] pathSegments = StringUtils.tokenizeToStringArray(requestUri, "/");
         if (pathSegments.length == 0) {
             return "";
