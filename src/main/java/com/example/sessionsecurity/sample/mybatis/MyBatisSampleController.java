@@ -18,7 +18,7 @@ public class MyBatisSampleController {
     @GetMapping("/routing-user")
     public ApiResponse<Map<String, String>> routingUser() {
         return ApiResponse.ok(Map.of(
-                "selectedDbUser", String.valueOf(DbUserContext.get()),
+                "selectedDbUser", DbUserContext.get(),
                 "usage", "Put @UseDbUser on a service method that calls MyBatis mapper."
         ));
     }
@@ -27,7 +27,7 @@ public class MyBatisSampleController {
     @GetMapping("/routing-user/by-url")
     public ApiResponse<Map<String, String>> routingUserByUrl() {
         return ApiResponse.ok(Map.of(
-                "selectedDbUser", String.valueOf(DbUserContext.get()),
+                "selectedDbUser", DbUserContext.get(),
                 "usage", "Configure app.datasource.url-user-mappings to route by request URI."
         ));
     }
@@ -37,7 +37,7 @@ public class MyBatisSampleController {
     @GetMapping("/routing-user/by-url-with-annotation")
     public ApiResponse<Map<String, String>> routingUserByUrlWithAnnotation() {
         return ApiResponse.ok(Map.of(
-                "selectedDbUser", String.valueOf(DbUserContext.get()),
+                "selectedDbUser", DbUserContext.get(),
                 "usage", "@UseDbUser has higher priority within the annotated method scope."
         ));
     }
@@ -46,7 +46,7 @@ public class MyBatisSampleController {
     @GetMapping("/routing-user/default")
     public ApiResponse<Map<String, String>> routingUserDefault() {
         return ApiResponse.ok(Map.of(
-                "selectedDbUser", String.valueOf(DbUserContext.get()),
+                "selectedDbUser", DbUserContext.get(),
                 "usage", "When no URL rule matches, default datasource user is applied."
         ));
     }
